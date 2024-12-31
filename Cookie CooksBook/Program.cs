@@ -1,18 +1,25 @@
 ﻿valueList valu = new valueList();
 WriteFile writeFile = new WriteFile();
 ReadFile readFile = new ReadFile();
+DisplayIngredient displayIngredient = new DisplayIngredient();
 
 string path = "C:\\Users\\Max\\Downloads\\abc.txt";
 int x = 0;
-string name;
+int name;
 Console.WriteLine("Exsisting File\n");
 readFile.fileRead(path);
 Console.WriteLine("\n");
+
+displayIngredient.ShowIngredient();
+
+
+
+
 while (x < 3)
 {
 
-    Console.WriteLine("Enter name :");
-    name = Console.ReadLine();
+    Console.WriteLine("Add Ingredient by it's Id or type 0' to if finished :");
+    name = int.Parse(Console.ReadLine());
 
     writeFile.add(name);
     x++;
@@ -20,7 +27,7 @@ while (x < 3)
 
 Console.WriteLine("\n\n\nAll Details");
 
-valu.ShowAllListDate();
+displayIngredient.abc(valu.Details);
 
 writeFile.fileWrite(path);
 
@@ -28,15 +35,43 @@ Console.WriteLine("save sussusfully");
 
 Console.ReadLine();
 
+
+public class DisplayIngredient
+{
+    public int EnumSelectedValue { get; set; }
+    public void ShowIngredient()
+    {
+        Console.WriteLine("Create a new cookies recipe! Available ingredients are :");
+        string IngredientList = @"1.WheatFlour
+2.CoconatFlour";
+        Console.WriteLine(IngredientList);
+    }
+
+    public void abc(List<int> select)
+    {
+           var enumValue = IngredientList.GetValues(typeof(IngredientList)).Cast<IngredientList>;
+        foreach (var Enumvalues in enumValue)
+        {
+         Console.WriteLine(Enumvalues);
+        }
+    }
+    public enum IngredientList
+    {
+        WheatFlour = 1,
+        CoconatFlour
+    }
+}
+
+
 public class valueList()
 {
 
 
-    public List<string> Details = new List<string>();
+    public List<int> Details = new List<int>();
     
     public void ShowAllListDate()
     {
-        foreach (string item in Details)
+        foreach (int item in Details)
         {
            
             Console.WriteLine(item);
@@ -47,7 +82,7 @@ public class valueList()
 
 public class WriteFile : valueList
 { 
-    public void add(string add) => Details.Add(add);
+    public void add(int add) => Details.Add(add);
     valueList valueList = new valueList();
     public void fileWrite(string path)
     {
