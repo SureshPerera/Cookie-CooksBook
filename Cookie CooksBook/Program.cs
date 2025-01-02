@@ -1,99 +1,189 @@
-﻿using static DisplayIngredient;
-
-valueList valu = new valueList();
-WriteFile writeFile = new WriteFile();
-ReadFile readFile = new ReadFile();
-DisplayIngredient displayIngredient = new DisplayIngredient();
-DocumentReader documentReader = new DocumentReader();
-
-string path = "C:\\Users\\Max\\Downloads\\abc.txt";
-int x ;
-bool y = true;
-string name;
-var Contents = File.ReadAllText(path);
-Console.WriteLine("Exsisting File\n");
-readFile.fileRead(path);
+﻿using Cookie_CooksBook.Recipes;
+using Cookie_CooksBook.Recipes.Ingredients;
+using System.IO;
+//using static DisplayIngredient;
 
 
 
-Console.WriteLine("\n");
+var cookiesRecepiesApp = new CookiesRecepiesApp(
+    new RecipesRepository(), 
+    new RecipesConsoleUserInterraction());
 
-displayIngredient.ShowIngredient();
+cookiesRecepiesApp.Run("recipes.txt");
 
 
-
-
-while (y)
+public class CookiesRecepiesApp
 {
+    private readonly IRecipesRepository _recipesRepository ;
+    private readonly IRecipesUserInterraction _recipesUserInterraction = 
+        new RecipesConsoleUserInterraction();
 
-    Console.WriteLine("Add Ingredient by it's Id or type 0' to if finished :");
-    name = Console.ReadLine();
-    if(int.TryParse(name, out int index))
+    public CookiesRecepiesApp(IRecipesRepository recipesRepository,
+        IRecipesUserInterraction recipesConsoleUserInterraction)
     {
-        if (index < 0)
-        {
-            Console.WriteLine("Try again..");
-            break;
-        }
-        else if (index > 8)
-        {
-            
-            Console.WriteLine("try again");
-            break;
-        }
-        else if (index == 0)
-        {
-            y = false;
-            Console.WriteLine("\n\n\nAll Details");
+        _recipesRepository = recipesRepository;
+        _recipesUserInterraction = recipesConsoleUserInterraction;
+    }
+    public void Run(string filePath)
+    {
+        var allRecipes = _recipesRepository.Read(filePath);
+        _recipesUserInterraction.PrintExcistingRecipes(allRecipes);
 
-           
-            break;
-            
+        _recipesUserInterraction.PromptToCreateRecipes();
 
+        var ingredients = _recipesUserInterraction.ReadIngredientFromUser();
+
+        if (ingredients.Count() > 0)
+        {
+            var recipes = new Recipes(ingredients);
+            allRecipes.Add(recipes);
+            _recipesRepository.Write(filePath, allRecipes);
+
+            _recipesUserInterraction.ShowMessage(
+                "Recipes Added :");
+            _recipesUserInterraction.ShowMessage(recipes.ToString());
         }
         else
         {
-            writeFile.add(index);
-            x = index;
+            _recipesUserInterraction.ShowMessage(
+                "No Ingredient have been selected" +
+                "Recipe will not be saved");
         }
+
+        _recipesUserInterraction.Exit();
     }
 }
 
-
-writeFile.fileWrite(path);
-
-valu.ShowAllListDate();
-
-Console.ReadLine();
-
-
-public class DisplayIngredient
+public interface IRecipesRepository
 {
-    public int EnumSelectedValue { get; set; }
-    public void ShowIngredient()
+    List<Recipes> Read(string filePath);
+}
+public interface IRecipesUserInterraction
+{
+    void ShowMessage(string message);
+    void Exit();
+    void PrintExcistingRecipes(IEnumerable<Recipes> allRecipes);
+    void PromptToCreateRecipes();
+    IEnumerable<Ingredient> ReadIngredientFromUser();
+}
+public class RecipesConsoleUserInterraction : IRecipesUserInterraction
+{
+    public readonly IngredientRegister _ingredientRegister = new ();
+
+ 
+    public  void Exit()
     {
-        Console.WriteLine("Create a new cookies recipe! Available ingredients are :");
-        string IngredientList = @"1.WheatFlour
-2.CoconatFlour
-3.Butter
-4.Chocolate
-5.Sugar
-6.Cardamom
-7.Cinnamon
-8.Cocoa powder";
-        Console.WriteLine("\n"+ IngredientList+ "\n");
+        Console.WriteLine("Press Any Key To Exit.");
+        Console.ReadKey();
     }
 
-    public enum IngredientList
+    public void PromptToCreateRecipes()
     {
-        WheatFlour = 1,
-        CoconatFlour,
-        Butter,
-        Chocolate,
-        Sugar,
-        Cardamom,
-        Cinnamon,
-        Cocoapowder
+        Console.WriteLine("Create a new cookies recipes!" +
+            "Available ingredients are :");
+        foreach (var ingredient in _ingredientRegister.All)
+        {
+            Console.WriteLine($"{ingredient.Id}.{ingredient.Name}");
+        }
+    }
+    public void PrintExcistingRecipes(IEnumerable<Recipes> allRecipes)
+    {
+        if(allRecipes.Count() > 0)
+        {
+            Console.WriteLine("Existing recipes are : " + Environment.NewLine);
+
+            int number = 1;
+            foreach(var recipt in allRecipes)
+            {
+                Console.WriteLine($"****{number}****");
+                Console.WriteLine(recipt);
+                Console.WriteLine();
+                ++number;
+            }
+        }
+    }
+
+
+    public  void ShowMessage(string message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public IEnumerable<Ingredient> ReadIngredientFromUser()
+    {
+        bool shallStop = false;
+        var ingredient = new List<Ingredient>();
+
+        while (!shallStop)
+        {
+            Console.WriteLine("Add an ingredient by Id," +
+                "or type anything else if finished");
+            var usrInput = Console.ReadLine();
+            if(int.TryParse(usrInput,out int id))
+            {
+                var selectedIngredient = _ingredientRegister.GetById(id);
+                if(selectedIngredient is not null)
+                {
+                    ingredient.Add(selectedIngredient);
+
+                }
+            }
+            else
+            {
+                shallStop = true;
+            }
+        }
+
+        return ingredient;
+    
+    }
+}
+
+public class IngredientRegister
+{
+    public IEnumerable<Ingredient> All { get; } = new List<Ingredient>
+    {
+        new WheatFlour(),
+        new SpeltFlour(),
+        new Butter(),
+        new Chocalate(),
+        new Suger(),
+        new Cardamon(),
+        new Cinnamon(),
+        new CocoaPowder()
+    };
+
+    public Ingredient GetById(int id)
+    {
+         foreach (var ingredient in All)
+        {
+            if(ingredient.Id == id)
+            {
+                return ingredient;
+            }
+           
+        }
+        return null;
+    }
+}
+
+public class RecipesRepository : IRecipesRepository
+{
+    public List<Recipes> Read(string filePath)
+    {
+        return new List<Recipes>
+        {
+            new Recipes(new List<Ingredient>
+            {
+                new WheatFlour(),
+                new Butter()
+            }),
+            new Recipes(new List<Ingredient>
+            {
+                new Butter(),
+                new WheatFlour(),
+            }),
+        };
     }
 }
 
@@ -141,21 +231,7 @@ public class ReadFile : valueList
 {
     public void fileRead(string path)
     {
-        var Content = File.ReadAllText(path);
-        var nameFromFile = Content.Split(Environment.NewLine);
-        foreach (var name in nameFromFile)
-        {
-            Console.WriteLine(name);
-        }
+        
     }
 }
 
-public class DocumentReader
-{
-    ReadFile readFile = new ReadFile();
-    public void showFileReader(string path)
-    {
-       
-       
-    }
-}

@@ -1,5 +1,4 @@
-﻿
-namespace Cookie_CooksBook.Recipes;
+﻿namespace Cookie_CooksBook.Recipes.Ingredients;
 
 public abstract class Flour : Ingredient
 {
