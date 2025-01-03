@@ -1,9 +1,10 @@
-﻿namespace Cookie_CooksBook.Recipes.Ingredients;
-
-public class CocoaPowder : Ingredient
+﻿namespace Cookie_CooksBook.Recipes.Ingredients
 {
-    public override int Id => 8;
-    public override string Name => "Cocoa Powder";
-    public virtual string PreparationInstruction => 
-        $"{base.PreparationInstruction}";
+    public class CocoaPowder : Ingredient
+    {
+        public override int Id => 8;
+        public override string Name => "Cocoa Powder";
+        public virtual string PreparationInstruction => 
+            $"{base.PreparationInstruction}";
+    }
 }

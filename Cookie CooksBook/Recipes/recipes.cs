@@ -1,22 +1,23 @@
 ﻿using Cookie_CooksBook.Recipes.Ingredients;
 
-namespace Cookie_CooksBook.Recipes;
-
-public class Recipes
+namespace Cookie_CooksBook.Recipes
 {
-    public IEnumerable<Ingredient> Ingredients { get; }
+    public partial class Recipes
+    {
+        public IEnumerable<Ingredient> Ingredients { get; }
 
-    public Recipes(IEnumerable<Ingredient> ingredients)
-    {
-        Ingredients = ingredients;
-    }
-    public override string ToString()
-    {
-        var steps = new List<string>();
-        foreach (var ingredient in Ingredients)
+        public Recipes(IEnumerable<Ingredient> ingredients)
         {
-            steps.Add($"{ingredient.Name}.{ingredient.PreparationInstruction}");
+            Ingredients = ingredients;
         }
-        return string.Join(Environment.NewLine, steps);
+        public override string ToString()
+        {
+            var steps = new List<string>();
+            foreach (var ingredient in Ingredients)
+            {
+                steps.Add($"{ingredient.Name}.{ingredient.PreparationInstruction}");
+            }
+            return string.Join(Environment.NewLine, steps);
+        }
     }
 }

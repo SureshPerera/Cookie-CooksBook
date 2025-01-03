@@ -1,10 +1,11 @@
-﻿namespace Cookie_CooksBook.Recipes.Ingredients;
-
-public class Butter : Ingredient
+﻿namespace Cookie_CooksBook.Recipes.Ingredients
 {
-    public override int Id => 3;
-    public override string Name => "Butter";
+    public class Butter : Ingredient
+    {
+        public override int Id => 3;
+        public override string Name => "Butter";
 
-    public override string PreparationInstruction =>
-        $"Melt on low heat {base.PreparationInstruction}";
+        public override string PreparationInstruction =>
+            $"Melt on low heat {base.PreparationInstruction}";
+    }
 }

@@ -1,8 +1,9 @@
-﻿namespace Cookie_CooksBook.Recipes.Ingredients;
-
-public class Suger : Ingredient
+﻿namespace Cookie_CooksBook.Recipes.Ingredients
 {
-    public override int Id => 5;
-    public override string Name => "Suger";
+    public class Suger : Ingredient
+    {
+        public override int Id => 5;
+        public override string Name => "Suger";
 
+    }
 }
